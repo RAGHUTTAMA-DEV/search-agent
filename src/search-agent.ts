@@ -32,7 +32,7 @@ async function searchWeb(state: SearchAgentStateType): Promise<Partial<SearchAge
     try {
         const searchQuery = state.query;
         const response = await tavilyClient.search(searchQuery, {
-            searchDepth: "basic", // ✅ "basic" | "advanced" — not "fast"
+            searchDepth: "basic", 
             maxResults: 5,
         });
 
@@ -107,7 +107,6 @@ What is your next action? Reply with JSON only.`
             }
         ])
 
-        // Extract JSON from response
         const responseText = response.content
         //@ts-ignore
         const jsonMatch = responseText.match(/\{[\s\S]*\}/)
