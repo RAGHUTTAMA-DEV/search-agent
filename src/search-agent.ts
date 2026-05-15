@@ -88,7 +88,7 @@ Be decisive. If you have good results already, use Finish. Avoid searching more 
 IMPORTANT: Always respond with valid JSON in this exact format (and nothing else):
 {
   "thought": "your reasoning here",
-  "action": "searchWeb" | "ScrapeWeb" |   "Finish",
+  "action": "searchWeb" | "ScrapeWeb" |    "Finish",
   "answer": "optional answer if action is Finish"
 }`
 
