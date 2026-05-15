@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SearchAgent -afsfa   Intelligent Web Research</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #00d9ff;
+            --secondary: #ff6b35;
+            --success: #00d97e;
+            --warning: #ffa502;
+            --danger: #ff4757;
+            --bg-dark: #0f1419;
+            --bg-card: #1a1f2e;
+            --bg-input: #151a27;
+            --text-primary: #ffffff;
+            --text-secondary: #a8aec3;
+            --text-tertiary: #7a7f99;
+            --border: #2a3142;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a0e14 0%, var(--bg-dark) 100%);
+            color: var(--text-primary);
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(0, 217, 255, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 80% 80%, rgba(255, 107, 53, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 60px;
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .logo-text h1 {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--text-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-text p {
+            font-size: 13px;
+            color: var(--text-tertiary);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-section {
+            width: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .search-form {
+            width: 100%;
+            margin-bottom: 32px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 8px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 15px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+
+        .search-button {
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, #0099cc 100%);
+            color: var(--bg-dark);
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            box-shadow: 0 4px 16px rgba(0, 217, 255, 0.3);
+        }
+
+        .search-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.4);
+        }
+
+        .search-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Result Card */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            animation: slideUp 0.6s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .status-badge.awaiting {
+            background: rgba(255, 165, 2, 0.15);
+            color: var(--warning);
+        }
+
+        .status-badge.completed {
+            background: rgba(0, 217, 126, 0.15);
+            color: var(--success);
+        }
+
+        .iteration-badge {
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Boxes */
+        .thought-box, .answer-box {
+            margin-bottom: 24px;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .box-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-tertiary);
+            margin-bottom: 8px;
+        }
+
+        .box-content {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            position: relative;
+        }
+
+        .spinner-ring {
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-approve {
+            background: linear-gradient(135deg, var(--success) 0%, #00a860 100%);
+            color: white;
+        }
+
+        .btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 217, 126, 0.3);
+        }
+
+        .btn-retry {
+            background: linear-gradient(135deg, var(--warning) 0%, #ff8c00 100%);
+            color: white;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 165, 2, 0.3);
+        }
+
+        .btn-new {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-new:hover {
+            border-color: var(--primary);
+            background: var(--border);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Hidden States */
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-tertiary);
+        }
+
+        /* Animations */
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .logo-text h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .input-wrapper {
+                gap: 6px;
+            }
+
+            .search-button span {
+                display: none;
+            }
+
+            .search-button {
+                min-width: 50px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">⚡</div>
+                <div class="logo-text">
+                    <h1>SearchAgent</h1>
+                    <p>Intelligent Web Research & Information Synthesis</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="search-section">
+                <!-- Idle State -->
+                <div id="idle-state">
+                    <form class="search-form" onsubmit="handleSearch(event)">
+                        <div class="input-wrapper">
+                            <input
+                                type="text"
+                                id="search-input"
+                                class="search-input"
+                                placeholder="What do you want to research?"
+                                required
+                            >
+                            <button type="submit" class="search-button">
+                                <span>Search</span>
+                                <span>→</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-state" class="hidden">
+                    <div class="spinner">
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <p style="text-align: center; font-size: 18px; font-weight: 600; margin-bottom: 12px;">
+                        Agent is thinking...
+                    </p>
+                    <p style="text-align: center; font-size: 14px; color: var(--text-tertiary);">
+                        Iteration <span id="iteration-count" style="color: var(--primary); font-weight: 600;">0</span>
+                    </p>
+                </div>
+
+                <!-- Result State -->
+                <div id="result-state" class="hidden">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="status-badge awaiting" id="status-badge">Awaiting Review</span>
+                            <span class="iteration-badge">
+                                <span id="final-iterations">0</span> iteration(s)
+                            </span>
+                        </div>
+
+                        <div id="thought-box" class="thought-box hidden">
+                            <p class="box-label">Agent's Reasoning</p>
+                            <p class="box-content" id="thought-content"></p>
+                        </div>
+
+                        <div id="answer-box" class="answer-box hidden">
+                            <p class="box-label" id="answer-label">Found Answer</p>
+                            <p class="box-content" id="answer-content"></p>
+                        </div>
+
+                        <div class="button-group" id="button-group">
+                            <button class="btn btn-approve" onclick="handleApprove()">✓ Approve</button>
+                            <button class="btn btn-retry" onclick="handleRetry()">⟳ Continue</button>
+                            <button class="btn btn-new" onclick="handleNewSearch()">+ New</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="hidden">
+                    <div class="result-card" style="text-align: center;">
+                        <div style="font-size: 48px; margin-bottom: 16px;">⚠</div>
+                        <p style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--danger);">
+                            Error
+                        </p>
+                        <p id="error-message" style="font-size: 14px; color: var(--text-secondary); margin-bottom: 24px;"></p>
+                        <button class="btn btn-new" onclick="handleNewSearch()">← Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Powered by LangChain + Tavily + Ollama</p>
+        </div>
+    </div>
+
+    <script>
+        let currentThreadId = null;
+
+        function showState(stateName) {
+            document.getElementById('idle-state').classList.add('hidden');
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('result-state').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            
+            document.getElementById(stateName).classList.remove('hidden');
+        }
+
+        async function handleSearch(event) {
+            event.preventDefault();
+            const query = document.getElementById('search-input').value;
+            
+            if (!query.trim()) return;
+
+            showState('loading-state');
+
+            try {
+                const response = await fetch('http://localhost:3000/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    currentThreadId = data.threadId;
+                    displayResult(data);
+                    showState('result-state');
+                }
+            } catch (error) {
+                showError(`Connection error: ${error.message}`);
+            }
+        }
+
+        function displayResult(data) {
+            document.getElementById('final-iterations').textContent = data.iterations || 0;
+            
+            if (data.thought) {
+                document.getElementById('thought-content').textContent = data.thought;
+                document.getElementById('thought-box').classList.remove('hidden');
+            } else {
+                document.getElementById('thought-box').classList.add('hidden');
+            }
+
+            if (data.answer) {
+                document.getElementById('answer-content').textContent = data.answer;
+                document.getElementById('answer-label').textContent = 'Found Answer';
+                document.getElementById('answer-box').classList.remove('hidden');
+            } else {
+                document.getElementById('answer-box').classList.add('hidden');
+            }
+
+            document.getElementById('status-badge').textContent = 'Awaiting Review';
+            document.getElementById('status-badge').className = 'status-badge awaiting';
+        }
+
+        async function handleApprove() {
+            showState('loading-state');
+
+            try {
+                const response = await fetch('http://localhost:3001/api/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ threadId: currentThreadId })
+                });
+
+                const data = await response.json();
+                document.getElementById('answer-label').textContent = 'Research Result';
+                document.getElementById('status-badge').textContent = '✓ Complete';
+                document.getElementById('status-badge').className = 'status-badge completed';
+                
+                // Hide action buttons
+                document.getElementById('button-group').innerHTML = 
+                    '<button class="btn btn-new" onclick="handleNewSearch()" style="grid-column: 1/-1;">+ New Search</button>';
+                
+                displayResult(data);
+                showState('result-state');
+            } catch (error) {
+                showError(`Connection error: ${error.message}`);
+            }
+        }
+
+        async function handleRetry() {
+            showState('loading-state');
+
+            try {
+                const response = await fetch('http://localhost:3001/api/retry', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ threadId: currentThreadId })
+                });
+
+                const data = await response.json();
+                displayResult(data);
+                
+                // Restore action buttons
+                document.getElementById('button-group').innerHTML = 
+                    '<button class="btn btn-approve" onclick="handleApprove()">✓ Approve</button>' +
+                    '<button class="btn btn-retry" onclick="handleRetry()">⟳ Continue</button>' +
+                    '<button class="btn btn-new" onclick="handleNewSearch()">+ New</button>';
+                
+                showState('result-state');
+            } catch (error) {
+                showError(`Connection error: ${error.message}`);
+            }
+        }
+
+        function handleNewSearch() {
+            document.getElementById('search-input').value = '';
+            currentThreadId = null;
+            
+            // Restore action buttons
+            document.getElementById('button-group').innerHTML = 
+                '<button class="btn btn-approve" onclick="handleApprove()">✓ Approve</button>' +
+                '<button class="btn btn-retry" onclick="handleRetry()">⟳ Continue</button>' +
+                '<button class="btn btn-new" onclick="handleNewSearch()">+ New</button>';
+            
+            showState('idle-state');
+            document.getElementById('search-input').focus();
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            showState('error-state');
+        }
+
+        // Focus input on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('search-input').focus();
+        });
+    </script>
+</body>
+</html>
