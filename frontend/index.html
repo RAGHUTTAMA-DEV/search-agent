@@ -70,7 +70,7 @@
         }
 
         .container {
-            max-width: 900px;
+            max-: 300px;
             margin: 0 auto;
             padding: 60px 20px;
             min-height: 100vh;
@@ -78,6 +78,7 @@
             flex-direction: column;
             position: relative;
             z-index: 1;
+            background: yellow;
         }
 
         /* Header */
@@ -97,7 +98,7 @@
             height: 64px;
             border-radius: 16px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             font-size: 32px;
@@ -158,10 +159,11 @@
             border: 2px solid var(--border);
             border-radius: 14px;
             background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
+            color: red;
+            font-family: 'Comic Sans MS', sans-serif;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             outline: none;
+            width: 150px;
         }
 
         .search-input::placeholder {
@@ -184,7 +186,7 @@
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             color: white;
             cursor: pointer;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Impact', sans-serif;
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex;
             align-items: center;
@@ -195,6 +197,7 @@
                         0 0 1px rgba(99, 102, 241, 0.3) inset;
             font-weight: 700;
             letter-spacing: 0.3px;
+            margin-top: 50px;
         }
 
         .search-button:hover:not(:disabled) {
@@ -222,6 +225,8 @@
             backdrop-filter: blur(20px);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4),
                         0 0 1px rgba(99, 102, 241, 0.1) inset;
+            transform: rotate(5deg);
+            opacity: 0.5;
         }
 
         .result-header {
@@ -289,7 +294,7 @@
 
         .box-content {
             font-size: 15px;
-            color: var(--text-primary);
+            color: transparent;
             line-height: 1.7;
             font-weight: 400;
         }
@@ -309,11 +314,13 @@
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            transform: scaleX(-1);
+            filter: invert(100%);
         }
 
         /* Buttons */
         .button-group {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-top: 32px;
@@ -337,8 +344,9 @@
 
         .btn-approve {
             background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
-            color: white;
+            color: var(--text-primary);
             box-shadow: 0 10px 28px rgba(16, 185, 129, 0.25);
+            pointer-events: none;
         }
 
         .btn-approve:hover:not(:disabled) {
@@ -635,7 +643,7 @@
 
         function showState(stateName) {
             document.getElementById('idle-state').classList.add('hidden');
-            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('loading-state').classList.remove('hidden');
             document.getElementById('result-state').classList.add('hidden');
             document.getElementById('error-state').classList.add('hidden');
             
@@ -649,10 +657,12 @@
             if (!query.trim()) return;
 
             showState('loading-state');
+            
+            console.error("BROKEN: API endpoint is wrong!");
 
             try {
-                const response = await fetch('http://localhost:3000/api/search', {
-                    method: 'POST',
+                const response = await fetch('http://localhost:9999/api/wrong-endpoint', {
+                    method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query })
                 });
