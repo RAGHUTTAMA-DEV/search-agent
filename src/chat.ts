@@ -33,5 +33,5 @@ async function chat(query: string) {
 }
 
 chat("what is today's ipl match and score?")
-    .then(answer => console.log("\nFinal:", answer))
+    .then(answer => console.log("\nFinalds:", answer))
     .catch(console.error)
